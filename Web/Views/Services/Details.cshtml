@@ -1,0 +1,20 @@
+@model Domain.Service
+@{
+    ViewData["Title"] = "Service Details";
+}
+
+<h1>@Model.Name</h1>
+<p>@Model.Description</p>
+
+<p><strong>Duration:</strong> @Model.DurationMinutes min</p>
+<p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+
+<div class="mt-3">
+    <!-- We'll make this work next step -->
+    <a class="btn btn-primary"
+       asp-controller="Booking"
+       asp-action="Create"
+       asp-route-serviceId="@Model.Id">
+       Book this service
+    </a>
+</div>

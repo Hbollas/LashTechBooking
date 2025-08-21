@@ -1,0 +1,19 @@
+@model Domain.Appointment
+@{
+    ViewData["Title"] = "Booking Confirmed";
+    var localStart = Model.StartUtc.ToLocalTime();
+    var localEnd   = Model.EndUtc.ToLocalTime();
+
+    // choose either 24-hour ("HH:mm") or 12-hour ("h:mm tt")
+    var dateText  = localStart.ToString("dddd, MMM d yyyy");
+    var startText = localStart.ToString("h:mm tt");  // or "HH:mm"
+    var endText   = localEnd.ToString("h:mm tt");    // or "HH:mm"
+}
+
+<h1>Thanks! Your booking is in.</h1>
+
+<p><strong>@Model.Service?.Name</strong></p>
+<p>@dateText — @startText to @endText</p>
+
+<p>We’ve saved this under <strong>@Model.CustomerName</strong> (@Model.CustomerEmail).</p>
+<p class="text-muted">Status: @Model.Status</p>

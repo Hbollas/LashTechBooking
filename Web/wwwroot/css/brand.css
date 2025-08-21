@@ -1,0 +1,63 @@
+:root{
+    --bg:#f4f0ec;       /* warm beige */
+    --panel:#efeae7;    /* lighter beige */
+    --pink:#f8c5c1;     /* blush band */
+    --ink:#4b3f3f;      /* taupe text */
+    --ink-soft:#6b5e5e;
+  }
+  html { scroll-behavior: smooth; }
+  /* Base */
+  html,body{background:var(--bg); color:var(--ink);}
+  body{font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;}
+  h1,h2,h3,.display-1,.display-2,.display-3{font-family:"Cormorant Garamond", Georgia, serif; color:var(--ink);}
+  a{color:inherit}
+  
+  /* Navbar tweaks */
+  .navbar{background:var(--panel); border-bottom:1px solid rgba(0,0,0,.08);}
+  .btn-pill{border-radius:9999px; padding:.55rem 1rem; background:#111; color:#fff;}
+  .btn-pill:hover{background:#000; color:#fff;}
+  
+  /* Hero (split) */
+  .hero {
+    background:#d7d4d1;   /* subtle gray panel like your screenshot */
+    padding:5rem 0;
+  }
+  .hero .headline{font-size:clamp(2.4rem, 4vw + 1rem, 4.5rem); line-height:1; letter-spacing:.5px;}
+  .hero .tagline{font-size:1.15rem; color:var(--ink-soft);}
+  
+  /* Pink “About” band */
+  .band-pink{background:var(--pink); padding:5rem 0;}
+  .band-pink h2{font-size:clamp(2.5rem, 5vw, 4rem);}
+  
+  /* Three-column info */
+  .section{padding:4rem 0;}
+  .tile{background:var(--panel); border-radius:1rem; padding:1.25rem 1.5rem; box-shadow:0 8px 24px rgba(0,0,0,.06);}
+  
+  /* Gallery */
+  .gallery-heading{
+    font-family:"Playfair Display", "Cormorant Garamond", serif;
+    font-style:italic; font-size:clamp(2.5rem,5vw,4.25rem); text-align:center;
+    margin:2rem 0 1rem; position:relative; display:inline-block;
+  }
+  .gallery-heading::after{content:""; position:absolute; left:0; right:0; bottom:-8px; height:8px; background:var(--ink); opacity:.25;}
+  .gallery-grid{display:grid; grid-template-columns:1fr; gap:1.25rem;}
+  @media (min-width: 900px){ .gallery-grid{grid-template-columns:1fr 1fr;} }
+  .gallery-grid img{width:100%; height:auto; border-radius:.75rem; display:block;}
+  
+  /* Services price list */
+  .price-hero{padding:5rem 0 2rem;}
+  .price-title{font-size:clamp(2.8rem,5vw,4rem); text-align:center; margin-bottom:2.5rem;}
+  .price-list{max-width:800px; margin:0 auto; padding:0; list-style:none;}
+  .price-item{display:flex; align-items:baseline; gap:1rem; padding:.75rem 0;}
+  .price-item .name{font-family:"Cormorant Garamond", serif; font-size:1.6rem;}
+  .price-item .dots{flex:1; border-bottom:1px dotted var(--ink); transform: translateY(-.35rem);}
+  .price-item .price{font-size:1.25rem;}
+  
+  /* wider wrapper */
+ .container-xl { max-width: 1280px; }
+
+ /* remove template padding so sections can go edge-to-edge */
+ main { padding: 0; }
+
+ /* make hero fill most of the screen */
+ .hero { min-height: 80vh; padding: 6rem 0 5rem; }
