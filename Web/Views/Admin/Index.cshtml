@@ -1,59 +1,112 @@
-@model IEnumerable<Web.Controllers.AdminController.AdminApptRow>
+@model Web.Models.AdminFilterVm
+@using Domain
 @{
-    ViewData["Title"] = "Admin • Appointments";
+    ViewData["Title"] = "Admin – Appointments";
 }
 
-<h1>Appointments</h1>
+<section class="max-w-screen-2xl mx-auto px-6 py-10">
+    <h1 class="font-display text-3xl md:text-4xl text-ink mb-6">Appointments</h1>
 
-@if (TempData["Message"] is string msg)
-{
-    <div class="alert alert-success">@msg</div>
-}
+    @if (TempData["Message"] is string msg)
+    {
+        <div class="rounded-xl bg-green-50 text-green-800 px-4 py-3 mb-6">@msg</div>
+    }
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Service</th>
-      <th>Customer</th>
-      <th>Email</th>
-      <th>Status</th>
-      <th>Deposit</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-  @foreach (var item in Model)
-  {
-      var startLocal = item.StartUtc.ToLocalTime();
-      var endLocal   = item.EndUtc.ToLocalTime();
-      <tr>
-        <td>@startLocal.ToString("ddd, MMM d")</td>
-        <td>@startLocal.ToString("h:mm tt") – @endLocal.ToString("h:mm tt")</td>
-        <td>@item.Service</td>
-        <td>@item.Customer</td>
-        <td>@item.Email</td>
-        <td>@item.Status</td>
-        <td>@(item.DepositPaid ? "Yes" : "No")</td>
-        <td class="text-end">
-          @if (item.Status == "Cancelled")
-          {
-              <span class="text-muted">Cancelled</span>
-          }
-          else
-          {
-              <form asp-action="Cancel" asp-controller="Admin" method="post" class="d-inline">
-                  @Html.AntiForgeryToken()
-                  <input type="hidden" name="id" value="@item.Id" />
-                  <button class="btn btn-sm btn-outline-danger"
-                          onclick="return confirm('Cancel this appointment?');">
-                      Cancel
-                  </button>
-              </form>
-          }
-        </td>
-      </tr>
-  }
-  </tbody>
-</table>
+    <form method="get" class="bg-panel rounded-2xl p-5 shadow mb-6 grid md:grid-cols-5 gap-4">
+        <div>
+            <label class="block text-sm text-mute mb-1">From</label>
+            <input type="date" name="From" value="@(Model.From?.ToString("yyyy-MM-dd"))"
+                   class="w-full rounded-xl border border-black/10 px-3 py-2" />
+        </div>
+        <div>
+            <label class="block text-sm text-mute mb-1">To</label>
+            <input type="date" name="To" value="@(Model.To?.ToString("yyyy-MM-dd"))"
+                   class="w-full rounded-xl border border-black/10 px-3 py-2" />
+        </div>
+        <div>
+            <label class="block text-sm text-mute mb-1">Status</label>
+          <select name="Status" class="w-full rounded-xl border border-black/10 px-3 py-2">
+                <option value="">All</option>
+
+                <option value="Pending"
+                        selected="@(Model.Status.HasValue && Model.Status.Value == AppointmentStatus.Pending ? "selected" : null)">
+                    Pending
+                </option>
+
+                <option value="Confirmed"
+                        selected="@(Model.Status.HasValue && Model.Status.Value == AppointmentStatus.Confirmed ? "selected" : null)">
+                    Confirmed
+                </option>
+
+                <option value="Cancelled"
+                        selected="@(Model.Status.HasValue && Model.Status.Value == AppointmentStatus.Cancelled ? "selected" : null)">
+                    Cancelled
+                </option>
+            </select>
+
+        </div>
+        <div class="md:col-span-2 flex items-end">
+            <button class="rounded-full bg-ink text-white px-5 py-2.5 font-semibold">Apply filters</button>
+        </div>
+    </form>
+
+    <div class="bg-white rounded-2xl shadow overflow-x-auto">
+        <table class="min-w-full text-sm">
+            <thead class="bg-stone/50">
+                <tr class="text-left">
+                    <th class="px-4 py-3">When</th>
+                    <th class="px-4 py-3">Service</th>
+                    <th class="px-4 py-3">Client</th>
+                    <th class="px-4 py-3">Email</th>
+                    <th class="px-4 py-3">Phone</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Deposit</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var a in Model.Results)
+            {
+                var localStart = TimeZoneInfo.ConvertTimeFromUtc(a.StartUtc, TimeZoneInfo.Local);
+                <tr class="border-t border-black/5">
+                    <td class="px-4 py-3 whitespace-nowrap">@localStart.ToString("ddd, MMM d @ h:mm tt")</td>
+                    <td class="px-4 py-3">@a.Service?.Name</td>
+                    <td class="px-4 py-3">@a.CustomerName</td>
+                    <td class="px-4 py-3">@a.CustomerEmail</td>
+                    <td class="px-4 py-3">@a.CustomerPhone</td>
+                    <td class="px-4 py-3">@a.Status</td>
+                    <td class="px-4 py-3">
+                        <form asp-action="ToggleDeposit" method="post" class="inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@a.Id" />
+                            <button class="px-3 py-1 rounded-full @(a.DepositPaid ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800")">
+                                @(a.DepositPaid ? "Paid" : "Unpaid")
+                            </button>
+                        </form>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="space-x-2">
+                            @if (a.Status == AppointmentStatus.Pending)
+                            {
+                                <form asp-action="Approve" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button class="rounded-full bg-blue-600 text-white px-3 py-1">Approve</button>
+                                </form>
+                            }
+                            @if (a.Status != AppointmentStatus.Cancelled)
+                            {
+                                <form asp-action="Cancel" method="post" class="inline" onsubmit="return confirm('Cancel this appointment?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button class="rounded-full bg-red-600 text-white px-3 py-1">Cancel</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

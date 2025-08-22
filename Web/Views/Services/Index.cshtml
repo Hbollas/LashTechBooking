@@ -3,23 +3,24 @@
 
 <section class="py-16">
   <div class="max-w-3xl mx-auto px-6 md:px-10">
-    <h1 class="font-display text-4xl md:text-5xl text-center text-ink mb-10">
+    <h1 class="font-display text-4xl md:text-5xl text-center text-ink mb-5">
       Lash Price List
     </h1>
+    <dt class="font-display text-1.5xl md:text-2xl text-center text-ink mb-5">Click on service to check details!</dt>
 
     <ul class="divide-y divide-ink/10 bg-panel rounded-xl shadow">
-      @foreach (var s in Model.OrderBy(x => x.Price))
+    @foreach (var s in Model.Where(x => x.IsActive).OrderBy(x => x.Name))
       {
-        <li class="flex flex-col md:flex-row md:items-center gap-3 px-5 py-4">
+        <li class="flex flex-col md:flex-row md:items-center gap-3 px-5 py-6">
           <div class="flex-1">
             <a asp-controller="Services" asp-action="Details" asp-route-id="@s.Id"
-               class="font-serif text-xl hover:underline">@s.Name</a>
+               class="font-serif text-2xl md:text-3xl font-semibold text-ink hover:underline">@s.Name</a>
             <div class="text-ink-soft text-sm">@s.DurationMinutes min</div>
           </div>
 
           <div class="flex items-center gap-4 md:gap-6">
             <span class="hidden md:block flex-1 border-b border-dotted border-ink/50 translate-y-[-.3rem]"></span>
-            <span class="text-lg font-semibold">@s.Price.ToString("C")</span>
+            <span class="text-lg font-semibold">$@((s.PriceCents / 100.0).ToString("0"))</span>
             <a asp-controller="Booking" asp-action="Create" asp-route-serviceId="@s.Id"
                class="inline-flex items-center rounded-full bg-ink text-white px-4 py-2 text-sm font-semibold">
               Book
@@ -30,3 +31,4 @@
     </ul>
   </div>
 </section>
+

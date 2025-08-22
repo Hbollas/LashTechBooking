@@ -31,8 +31,8 @@ public class ServicesController : Controller
             "name_desc"      => query.OrderByDescending(s => s.Name),
             "duration"       => query.OrderBy(s => s.DurationMinutes),
             "duration_desc"  => query.OrderByDescending(s => s.DurationMinutes),
-            "price_desc"     => query.OrderByDescending(s => s.Price),
-            _                => query.OrderBy(s => s.Price) // default: price asc
+            "price_desc"     => query.OrderByDescending(s => s.PriceCents),
+            _                => query.OrderBy(s => s.PriceCents) // default: price asc
         };
 
         var services = await query.AsNoTracking().ToListAsync();

@@ -1,67 +1,117 @@
-using Domain;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Web.Models;
+using Domain;
+using System.Text;
 
 namespace Web.Controllers;
+
 [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly AppDbContext _db;
-    public AdminController(AppDbContext db) => _db = db;
+    private readonly IEmailSender _email;
 
-    // GET: /Admin
-    [HttpGet]
-    public async Task<IActionResult> Index()
+    public AdminController(AppDbContext db, IEmailSender email)
     {
-        var items = await _db.Appointments
-            .Include(a => a.Service)
-            .OrderBy(a => a.StartUtc)
-            .Select(a => new AdminApptRow
-            {
-                Id = a.Id,
-                Service = a.Service!.Name,
-                Customer = a.CustomerName,
-                Email = a.CustomerEmail,
-                StartUtc = a.StartUtc,
-                EndUtc = a.EndUtc,
-                Status = a.Status.ToString(),
-                DepositPaid = a.DepositPaid
-            })
-            .AsNoTracking()
-            .ToListAsync();
-
-        return View(items);
+        _db = db;
+        _email = email;
     }
 
-    // POST: /Admin/Cancel
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    // /Admin?From=2025-08-21&To=2025-08-28&Status=Pending
+    [HttpGet]
+    public async Task<IActionResult> Index([FromQuery] AdminFilterVm f)
+    {
+        // sensible defaults: upcoming 14 days, all statuses
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        f.From ??= today;
+        f.To ??= today.AddDays(14);
+
+        var fromUtc = f.From.Value.ToDateTime(new TimeOnly(0, 0)).ToUniversalTime();
+        var toUtc = f.To.Value.ToDateTime(new TimeOnly(23, 59)).ToUniversalTime();
+
+        var q = _db.Appointments.Include(a => a.Service).AsQueryable();
+        q = q.Where(a => a.StartUtc >= fromUtc && a.StartUtc <= toUtc);
+
+        if (f.Status.HasValue) q = q.Where(a => a.Status == f.Status.Value);
+
+        f.Results = await q.OrderBy(a => a.StartUtc).Take(500).AsNoTracking().ToListAsync();
+        return View(f);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Approve(Guid id)
+    {
+        var appt = await _db.Appointments
+            .Include(a => a.Service)
+            .FirstOrDefaultAsync(a => a.Id == id);
+        if (appt is null) return NotFound();
+
+        appt.Status = AppointmentStatus.Confirmed;
+        await _db.SaveChangesAsync();
+
+        await SendApprovedEmail(appt);
+        TempData["Message"] = "Appointment approved and email sent.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(Guid id)
+    {
+        var appt = await _db.Appointments.Include(a => a.Service)
+            .FirstOrDefaultAsync(a => a.Id == id);
+        if (appt is null) return NotFound();
+
+        appt.Status = AppointmentStatus.Cancelled;
+        await _db.SaveChangesAsync();
+
+        var local = ToLocal(appt.StartUtc);
+        var serviceName = appt.Service?.Name ?? "your service";
+        var body =
+            $"Hi {HtmlEncode(appt.CustomerName)},<br/>" +
+            $"Your appointment for <b>{HtmlEncode(serviceName)}</b> " +
+            $"on <b>{local:f}</b> has been cancelled.";
+        await _email.SendEmailAsync(appt.CustomerEmail, "Appointment cancelled", body);
+
+        TempData["Message"] = "Appointment cancelled.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleDeposit(Guid id)
     {
         var appt = await _db.Appointments.FindAsync(id);
         if (appt is null) return NotFound();
 
-        if (appt.Status != AppointmentStatus.Cancelled)
-        {
-            appt.Status = AppointmentStatus.Cancelled;
-            await _db.SaveChangesAsync();
-            TempData["Message"] = "Appointment cancelled.";
-        }
+        appt.DepositPaid = !appt.DepositPaid;
+        await _db.SaveChangesAsync();
 
+        TempData["Message"] = appt.DepositPaid ? "Deposit marked PAID." : "Deposit marked UNPAID.";
         return RedirectToAction(nameof(Index));
     }
 
-    public record AdminApptRow
+    private async Task SendApprovedEmail(Domain.Appointment appt)
     {
-        public Guid Id { get; init; }
-        public string Service { get; init; } = "";
-        public string Customer { get; init; } = "";
-        public string Email { get; init; } = "";
-        public DateTime StartUtc { get; init; }
-        public DateTime EndUtc { get; init; }
-        public string Status { get; init; } = "";
-        public bool DepositPaid { get; init; }
+        var local = ToLocal(appt.StartUtc);
+        var serviceName = appt.Service?.Name ?? "your service";
+        var duration = appt.Service?.DurationMinutes ?? 0;
+
+        var body =
+            $"Hi {HtmlEncode(appt.CustomerName)},<br/>" +
+            $"Great news—your appointment for <b>{HtmlEncode(serviceName)}</b> is <b>confirmed</b>.<br/>" +
+            $"<b>When:</b> {local:f}<br/>" +
+            (duration > 0 ? $"<b>Duration:</b> {duration} min<br/><br/>" : "<br/>") +
+            $"See you soon!";
+
+
+        await _email.SendEmailAsync(appt.CustomerEmail, "Your appointment is confirmed", body);
     }
+
+    private static DateTime ToLocal(DateTime utc)
+        => TimeZoneInfo.ConvertTimeFromUtc(utc, TimeZoneInfo.Local);
+
+    private static string HtmlEncode(string s) => System.Net.WebUtility.HtmlEncode(s);
 }

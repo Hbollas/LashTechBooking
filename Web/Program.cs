@@ -3,8 +3,14 @@ using Infrastructure.Seed;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Web.Infrastructure.Email;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

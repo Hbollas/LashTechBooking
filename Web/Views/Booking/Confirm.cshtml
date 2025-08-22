@@ -1,19 +1,110 @@
 @model Domain.Appointment
-@{
-    ViewData["Title"] = "Booking Confirmed";
-    var localStart = Model.StartUtc.ToLocalTime();
-    var localEnd   = Model.EndUtc.ToLocalTime();
+@using System.Globalization
 
-    // choose either 24-hour ("HH:mm") or 12-hour ("h:mm tt")
-    var dateText  = localStart.ToString("dddd, MMM d yyyy");
-    var startText = localStart.ToString("h:mm tt");  // or "HH:mm"
-    var endText   = localEnd.ToString("h:mm tt");    // or "HH:mm"
+@{
+    ViewData["Title"] = "Booking confirmed";
+    var start = Model.StartUtc.ToLocalTime();
+    var end   = Model.EndUtc.ToLocalTime();
+    var durationMin = (int)(end - start).TotalMinutes;
 }
 
-<h1>Thanks! Your booking is in.</h1>
+<section class="bg-stone/60 border-b border-black/5 py-10">
+  <div class="max-w-6xl mx-auto px-6">
+    <h1 class="font-display text-3xl md:text-4xl text-ink">Thanks! Your booking is confirmed 🎉.</h1>
+    <p class="text-mute mt-2">Thanks, @Model.CustomerName! You'll receive an email confirmation shortly.</p>
+  </div>
+</section>
 
-<p><strong>@Model.Service?.Name</strong></p>
-<p>@dateText — @startText to @endText</p>
+<section class="py-12">
+  <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-3 gap-8">
 
-<p>We’ve saved this under <strong>@Model.CustomerName</strong> (@Model.CustomerEmail).</p>
-<p class="text-muted">Status: @Model.Status</p>
+    <!-- Summary -->
+    <div class="lg:col-span-2">
+      <div class="bg-panel rounded-2xl p-6 shadow">
+        <h2 class="font-serif text-2xl text-ink mb-4">Appointment summary</h2>
+
+        <dl class="divide-y divide-black/5">
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Service</dt>
+            <dd class="text-ink font-medium">@Model.Service?.Name</dd>
+          </div>
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Date</dt>
+            <dd class="text-ink">
+              @start.ToString("dddd, MMM d, yyyy")
+            </dd>
+          </div>
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Time</dt>
+            <dd class="text-ink">
+              @start.ToString("h:mm tt", CultureInfo.InvariantCulture)
+              – @end.ToString("h:mm tt", CultureInfo.InvariantCulture)
+            </dd>
+          </div>
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Duration</dt>
+            <dd class="text-ink">@durationMin min</dd>
+          </div>
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Name</dt>
+            <dd class="text-ink">@Model.CustomerName</dd>
+          </div>
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Email</dt>
+            <dd class="text-ink">@Model.CustomerEmail</dd>
+          </div>
+
+          @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+          {
+            <div class="flex justify-between py-3">
+              <dt class="text-mute">Phone</dt>
+              <dd class="text-ink">@Model.CustomerPhone</dd>
+            </div>
+          }
+
+          <div class="flex justify-between py-3">
+            <dt class="text-mute">Status</dt>
+            <dd>
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-sm
+                           @(Model.Status == Domain.AppointmentStatus.Pending ? "bg-yellow-100 text-yellow-800" :
+                             Model.Status == Domain.AppointmentStatus.Confirmed ? "bg-green-100 text-green-800" :
+                             "bg-gray-100 text-gray-800")">
+                @Model.Status
+              </span>
+            </dd>
+          </div>
+        </dl>
+        <p class="text-xs text-mute mt-4">By attending, you agree to our <a href="/#info" class="underline">policies</a>.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a asp-controller="Services" asp-action="Index"
+             class="inline-flex items-center rounded-full bg-ink text-white px-5 py-2 font-semibold hover:opacity-90">
+            Book another service
+          </a>
+          <a asp-controller="Home" asp-action="Index"
+             class="inline-flex items-center rounded-full border border-black/10 bg-white px-5 py-2 font-semibold text-ink hover:bg-black/5">
+            Back to home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nice note -->
+    <aside>
+      <div class="bg-white rounded-2xl p-6 shadow border border-black/5 lg:sticky lg:top-24">
+        <h3 class="font-serif text-xl text-ink">What’s next?</h3>
+        <ul class="mt-3 space-y-2 text-sm text-ink/90">
+          <li>• You’ll receive a confirmation email shortly.</li>
+          <li>• Need to change anything? Reply to the email.</li>
+          <li>• Please arrive 5–10 minutes early.</li>
+          <li>• NO caffeined right before your appointment.</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</section>

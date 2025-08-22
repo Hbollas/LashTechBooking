@@ -1,21 +1,22 @@
 ﻿@{
     ViewData["Title"] = "Home";
 }
+
 <!-- HERO -->
-<section class="relative min-h-[60vh] bg-[#d7d4d1] flex items-center py-12 md:py-16">
+<section id="top" class="relative min-h-[65vh] bg-stone flex items-center">
   <div class="max-w-screen-xl mx-auto px-6 md:px-10 w-full">
     <div class="grid md:grid-cols-2 items-center gap-10">
       <div>
-        <h1 class="font-display text-4xl md:text-6xl leading-tight text-ink">
-          Radiant Beauty for All
+        <h1 class="font-display text-5xl md:text-7xl leading-tight text-ink">
+          Radiant<br/>Beauty for All
         </h1>
-        <p class="mt-4 text-ink-soft text-lg md:text-xl">
-          Classic, Volume, and Fills—book online in seconds.
+        <p class="mt-5 text-mute text-lg md:text-xl max-w-prose">
+          Your journey to confidence and beauty starts here.
         </p>
-        <div class="mt-6 flex flex-wrap gap-3">
+        <div class="mt-7 flex gap-3">
           <a asp-controller="Services" asp-action="Index"
              class="inline-flex items-center rounded-full bg-ink text-white px-6 py-2.5 text-sm font-semibold">
-            See services
+            Book now
           </a>
           <a asp-controller="Gallery" asp-action="Index"
              class="inline-flex items-center rounded-full border border-ink text-ink px-6 py-2.5 text-sm font-semibold">
@@ -23,45 +24,46 @@
           </a>
         </div>
       </div>
+
       <div class="hidden md:block">
-        <img src="~/images/hero-logo.png" alt="Brand artwork"
-             class="w-full rounded-xl shadow-lg" />
+        <img src="~/images/hero.png" 
+             class="w-l rounded-l shadow-lg" />
       </div>
     </div>
   </div>
 </section>
 
-<!-- ABOUT BAND -->
-<section class="bg-pink py-16" id="about">
+<!-- ABOUT -->
+<section id="about" class="bg-blush py-16 md:py-20">
   <div class="max-w-4xl mx-auto px-6 md:px-10 text-center">
-    <h2 class="font-display text-4xl text-ink mb-3">About</h2>
-    <p class="text-ink text-lg">
+    <h2 class="font-display text-4xl md:text-5xl text-ink mb-4">About</h2>
+    <p class="text-ink max-w-3xl mx-auto text-lg leading-relaxed">
       Hi beauties! I want to start off by introducing myself… (add your real About blurb here).
     </p>
   </div>
 </section>
 
-<!-- INFO CARDS -->
-<section class="py-16" id="info">
+<!-- POLICIES / INFO -->
+<section id="info" class="py-16 md : py-24">
   <div class="max-w-screen-xl mx-auto px-6 md:px-10">
     <h3 class="font-serif text-3xl text-ink text-center mb-10">
       Policies • Location • Payments
     </h3>
     <div class="grid md:grid-cols-3 gap-6">
       <div class="bg-panel rounded-xl p-6 shadow">
-        <h4 class="font-serif text-xl mb-2">Policies</h4>
-        <ul class="text-ink-soft space-y-1">
+        <h4 class="font-serif text-xl mb-2 text-ink">Policies</h4>
+        <ul class="text-mute space-y-1">
           <li>24-hr cancellation • 10-min grace</li>
           <li>Aftercare provided</li>
         </ul>
       </div>
       <div class="bg-panel rounded-xl p-6 shadow">
-        <h4 class="font-serif text-xl mb-2">Location</h4>
-        <p class="text-ink-soft">Home studio — address sent day before.</p>
+        <h4 class="font-serif text-xl mb-2 text-ink">Location</h4>
+        <p class="text-mute">Home studio — address sent the day before.</p>
       </div>
       <div class="bg-panel rounded-xl p-6 shadow">
-        <h4 class="font-serif text-xl mb-2">Payment</h4>
-        <p class="text-ink-soft">Zelle, Cash App, Apple Pay, Cash. $10 deposit.</p>
+        <h4 class="font-serif text-xl mb-2 text-ink">Payment</h4>
+        <p class="text-mute">Zelle, Cash App, Apple Pay, Cash. $10 deposit.</p>
       </div>
     </div>
   </div>

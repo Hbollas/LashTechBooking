@@ -19,5 +19,9 @@ public class CreateBookingForm
     public string CustomerEmail { get; set; } = string.Empty;
 
     [Phone]
+    [Display(Name = "Phone (optional)")]
+    [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$",
+        ErrorMessage = "Please enter a valid US phone number, e.g. (414) 555-0123")]
     public string? CustomerPhone { get; set; }
+
 }

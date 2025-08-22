@@ -18,85 +18,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-    tailwind.config = {
-        theme: {
-        extend: {
-            colors: {
-            bg:'#f4f0ec', panel:'#efeae7', pink:'#f8c5c1',
-            ink:'#4b3f3f', 'ink-soft':'#6b5e5e'
-            },
-            fontFamily: {
-            sans: ['Inter','ui-sans-serif','system-ui'],
-            serif: ['"Cormorant Garamond"', 'ui-serif', 'Georgia'],
-            display: ['"Playfair Display"', 'serif']
+        <script>
+        tailwind.config = {
+            theme: {
+            extend: {
+                colors: {
+                cream:  "#f5f2ef",   // page bg
+                stone:  "#d7d4d1",   // hero bg
+                blush:  "#f4cfc8",   // about band
+                panel:  "#efeae7",   // cards
+                ink:    "#3f3534",   // primary text
+                mute:   "#6d6260"    // secondary text
+                },
+                fontFamily: {
+                sans: ['Inter','ui-sans-serif','system-ui'],
+                serif: ['"Cormorant Garamond"','ui-serif','Georgia'],
+                display: ['"Playfair Display"','serif']
+                }
+            }
             }
         }
-        }
-    }
-    </script>
+        </script>
 
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/brand.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
-</head>
+        <!-- Styles -->
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/brand.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
+ </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
-            <div class="container-xl">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ashley's Website</a>
+        <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-black/5">
+            <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center gap-6">
+                <a asp-controller="Home" asp-action="Index"
+                class="font-display text-2xl md:text-3xl tracking-wide text-ink no-underline hover:opacity-80">
+                AA’s Aesthetics
+                </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Services</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Gallery" asp-action="Index">Gallery</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link text-dark" href="/#about">About</a>                        
-                        </li>
+                    <nav class="ms-auto">
+                    <ul class="flex items-center gap-6 text-[15px]">
+                        <li><a asp-controller="Services" asp-action="Index" class="text-ink hover:opacity-75">Services</a></li>
+                        <li><a asp-controller="Gallery"  asp-action="Index" class="text-ink hover:opacity-75">Gallery</a></li>
+                        <li><a href="/#about" class="text-ink hover:opacity-75">About / Info</a></li>
                     </ul>
+                    </nav>
 
-                    <ul class="navbar-nav">
-                        @if (User?.Identity?.IsAuthenticated ?? false)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">Account</a>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                                    <button class="nav-link btn btn-link text-dark" type="submit">Logout</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                            </li>
-                        }
-
-                        <li class="nav-item ms-2">
-                            <a class="btn btn-pill" asp-controller="Services" asp-action="Index">Book</a>
-                        </li>
-                    </ul>
-                </div>
+                <a asp-controller="Services" asp-action="Index"
+                class="ms-4 inline-flex items-center rounded-full bg-ink text-white px-5 py-2 text-sm font-semibold hover:opacity-90">
+                Book
+                </a>
             </div>
-        </nav>
-    </header>
+        </header>
+
 
     <!-- Full-width main -->
          <main role="main">
@@ -110,14 +81,14 @@
         </main>
 
 
-    <footer class="border-top footer text-muted">
-        <div class="container-xl">
-            &copy; 2025 - Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-t border-black/5 text-mute">
+        <div class="max-w-screen-2xl mx-auto px-6 py-8 text-sm">
+                © 2025 — AA’s Aesthetics ·
+            <a asp-controller="Home" asp-action="Privacy" class="underline hover:no-underline">Privacy</a>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -61,3 +61,4 @@
 
  /* make hero fill most of the screen */
  .hero { min-height: 80vh; padding: 6rem 0 5rem; }
+ html { scroll-behavior: smooth; } 
